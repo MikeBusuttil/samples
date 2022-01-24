@@ -15,10 +15,12 @@ const stopButton = document.getElementById('stopButton');
 startButton.onclick = start;
 stopButton.onclick = stop;
 
+const logMeter = document.querySelector('#logarithmic meter');
 const instantMeter = document.querySelector('#instant meter');
 const slowMeter = document.querySelector('#slow meter');
 const clipMeter = document.querySelector('#clip meter');
 
+const logValueDisplay = document.querySelector('#logarithmic .value');
 const instantValueDisplay = document.querySelector('#instant .value');
 const slowValueDisplay = document.querySelector('#slow .value');
 const clipValueDisplay = document.querySelector('#clip .value');
@@ -42,6 +44,9 @@ function handleSuccess(stream) {
       return;
     }
     meterRefresh = setInterval(() => {
+      window.soundMeter.analyze();
+      logMeter.value = logValueDisplay.innerText =
+        (1 - Math.exp(-10*soundMeter.instant)).toFixed(2);
       instantMeter.value = instantValueDisplay.innerText =
         soundMeter.instant.toFixed(2);
       slowMeter.value = slowValueDisplay.innerText =
@@ -83,6 +88,7 @@ function stop() {
   window.stream.getTracks().forEach(track => track.stop());
   window.soundMeter.stop();
   clearInterval(meterRefresh);
+  logMeter.value = logValueDisplay.innerText = '';
   instantMeter.value = instantValueDisplay.innerText = '';
   slowMeter.value = slowValueDisplay.innerText = '';
   clipMeter.value = clipValueDisplay.innerText = '';
